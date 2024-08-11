@@ -1,9 +1,9 @@
 .venv
 .idea
-./backend/.env
+backend/.env
 .env
-./backend/db.sqlite3
-./frontend/node_modules
+backend/db.sqlite3
+frontend/node_modules
 **/__pycache__/
 .DS_Store
-./backend/DS_Store
+backend/DS_Store

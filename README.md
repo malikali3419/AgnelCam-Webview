@@ -10,6 +10,9 @@ AngelCam Web View is a Django project that provides a web interface for interact
    - [Accounts](#accounts)
    - [Cameras](#cameras)
 4. [Usage](#usage)
+5. [Running frontend](#running-frontend)
+   - [Without Docker](#without-docker)
+   - [With Docker](#with-docker)
 
 ## Installation
 
@@ -21,6 +24,7 @@ cd angelcam-web-view
 ```
 **Create and Activate a Virtual Environment**
 ```bash
+cd backend
 python -m venv venv
 source venv/bin/activate
 ```
@@ -49,6 +53,7 @@ To deploy the project using Docker, follow these steps:
 **Build the Docker Image**
 
 ```bash
+cd backend
 docker-compose up --build
 ```
 ## API Endpoints
@@ -101,6 +106,51 @@ docker-compose up --build
       "speed": 1.0
     }
     ```
+
+## Running the Frontend
+
+### Without Docker
+
+To run the frontend project without Docker, follow these steps:
+
+1. **Navigate to the Frontend Directory**
+
+   If the frontend is in the `frontend` folder:
+
+   ```bash
+   cd frontend
+   ```
+2. **Install Dependencies**
+   ```bash
+    npm install
+   ```
+3. **Start the Development Server**
+   ```bash
+   npm start
+    ```
+4. **Url**
+
+   Project will on this url
+  `http://localhost:3000`
+
+### With Docker
+1. **Navigate to the Frontend Directory**
+
+   If the frontend is in the `frontend` folder:
+
+   ```bash
+   cd frontend
+   ```
+
+2. **Run the Commands**
+   ```bash
+   docker compose up --build
+    ```
+3. **Url**
+
+   Project will on this url
+  `http://localhost:3000`
+
 
 ## Usage
 
