@@ -13,6 +13,6 @@ repos:
     hooks:
       - id: run-django-checks
         name: Run Django checks
-        entry: python manage.py check
+        entry: python backend/manage.py check
         language: system
         pass_filenames: false
