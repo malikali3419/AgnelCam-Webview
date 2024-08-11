@@ -15,7 +15,7 @@ urlpatterns = [
     path("cameras/", CameraListView.as_view(), name="camera-list"),
     path("camera/<int:camera_id>", CameraView.as_view(), name="camera"),
     path(
-        "camera/<str:camera_id>/recording/timeline",
+        "camera/<str:camera_id>/recording/timeline/",
         CamerasRecordingTimeLineView.as_view(),
         name="camera-recording-timeline",
     ),

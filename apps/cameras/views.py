@@ -1,4 +1,3 @@
-# cameras/views.py
 import json
 
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -18,6 +17,20 @@ from apps.utils.auth import require_personal_access_token
 
 
 class CameraLiveStreamView(View):
+    """
+    View to retrieve the live stream URL for a given camera.
+
+    Endpoint:
+        GET /camera/<camera_id>/recording/stream
+
+    Parameters:
+        - camera_id (str): The unique identifier for the camera.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the live stream URL.
+        - 400 Bad Request: If unable to fetch the live stream URL.
+    """
+
     @staticmethod
     def get(request, camera_id):
         headers = {
@@ -36,6 +49,17 @@ class CameraLiveStreamView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class CameraListView(View):
+    """
+    View to list all cameras for the authenticated user.
+
+    Endpoint:
+        GET /camera/
+
+    Response:
+        - 200 OK: Returns a JSON response containing a list of cameras.
+        - 400 Bad Request: If there is an issue with the response data.
+    """
+
     @staticmethod
     def get(request):
         headers = {
@@ -56,6 +80,20 @@ class CameraListView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class CameraView(View):
+    """
+    View to retrieve details for a specific camera.
+
+    Endpoint:
+        GET /camera/<camera_id>/
+
+    Parameters:
+        - camera_id (str): The unique identifier for the camera.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the camera details.
+        - 400 Bad Request: If there is an issue with the response data.
+    """
+
     @staticmethod
     def get(request, camera_id):
         headers = {
@@ -66,16 +104,45 @@ class CameraView(View):
         )
         if response.status_code == 200:
             cameras_data = response.json()
+            streams = cameras_data.get("streams", [])
+
+            filtered_streams = [
+                stream
+                for stream in streams
+                if stream.get("format") == "mjpeg" or stream.get("format") == "mp4"
+            ]
+
+            cameras_data["streams"] = filtered_streams
+
             serializer = CameraSerializer(data=cameras_data)
             if serializer.is_valid():
                 return JsonResponse(
                     serializer.data, safe=False, status=status.HTTP_200_OK
                 )
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(
+            {"error": "Failed to fetch camera data from external service"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class CamerasRecordingTimeLineView(View):
+    """
+    View to retrieve the recording timeline for a specific camera.
+
+    Endpoint:
+        GET /camera/<camera_id>/recording/timeline/
+
+    Parameters:
+        - start (str): The start timestamp for the timeline.
+        - end (str): The end timestamp for the timeline.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the recording timeline data.
+        - 400 Bad Request: If start or end parameters are missing or if there is an issue with the response data.
+    """
+
     @staticmethod
     def get(request, camera_id):
         start = request.GET.get("start")
@@ -110,6 +177,20 @@ class CamerasRecordingTimeLineView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class StreamView(View):
+    """
+    View to retrieve the streaming data for a specific camera.
+
+    Endpoint:
+        GET /camera/<camera_id>/recording/stream/
+
+    Parameters:
+        - start (str): The start timestamp for the stream.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the stream data.
+        - 400 Bad Request: If start parameter is missing or if there is an issue with the response data.
+    """
+
     @staticmethod
     def get(request, camera_id):
         start = request.GET.get("start")
@@ -146,6 +227,20 @@ class StreamView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class RecordingView(View):
+    """
+    View to retrieve recording data for a specific camera.
+
+    Endpoint:
+        GET /camera/<camera_id>/recording/
+
+    Parameters:
+        - camera_id (str): The unique identifier for the camera.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the recording data.
+        - 400 Bad Request: If there is an issue with the response data.
+    """
+
     @staticmethod
     def get(request, camera_id):
         headers = {
@@ -171,6 +266,21 @@ class RecordingView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class PlayRecordingView(View):
+    """
+    View to start playback of a recording for a specific camera.
+
+    Endpoint:
+        POST /camera/<domain>/recording/streams/<stream_id>/play/
+
+    Parameters:
+        - domain (str): The domain of the recording service.
+        - stream_id (str): The unique identifier for the stream.
+
+    Response:
+        - 200 OK: Returns a JSON response indicating that playback has started.
+        - 400 Bad Request: If playback cannot be started or if there is an issue with the request.
+    """
+
     @staticmethod
     def get(request, domain, stream_id):
         headers = {
@@ -192,6 +302,21 @@ class PlayRecordingView(View):
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class PauseRecordingView(View):
+    """
+    View to pause playback of a recording for a specific camera.
+
+    Endpoint:
+        POST /camera/<domain>/recording/streams/<stream_id>/pause/
+
+    Parameters:
+        - domain (str): The domain of the recording service.
+        - stream_id (str): The unique identifier for the stream.
+
+    Response:
+        - 200 OK: Returns a JSON response indicating that playback has been paused.
+        - 400 Bad Request: If playback cannot be paused or if there is an issue with the request.
+    """
+
     @staticmethod
     def get(request, domain, stream_id):
         headers = {
@@ -207,12 +332,30 @@ class PauseRecordingView(View):
                 {"status": "paused"}, safe=False, status=status.HTTP_200_OK
             )
         return JsonResponse(
-            {"detail": "Failed to play the video"}, status=response.status_code
+            {"detail": "Failed to pause the recording"}, status=response.status_code
         )
 
 
 @method_decorator(require_personal_access_token, name="dispatch")
 class SpeedRecordingView(View):
+    """
+    View to update the playback speed of a recording for a specific camera.
+
+    Endpoint:
+        POST /camera/<domain>/recording/streams/<stream_id>/speed/
+
+    Parameters:
+        - domain (str): The domain of the recording service.
+        - stream_id (str): The unique identifier for the stream.
+
+    Request Body:
+        - speed (int): The playback speed.
+
+    Response:
+        - 200 OK: Returns a JSON response indicating that the speed has been updated.
+        - 400 Bad Request: If there is an issue with the request or if the speed value is invalid.
+    """
+
     @staticmethod
     def get(request, domain, stream_id):
         try:
@@ -245,5 +388,6 @@ class SpeedRecordingView(View):
                 {"success": "true"}, safe=False, status=status.HTTP_200_OK
             )
         return JsonResponse(
-            {"detail": "Failed to play the video"}, status=response.status_code
+            {"detail": "Failed to update the playback speed"},
+            status=response.status_code,
         )

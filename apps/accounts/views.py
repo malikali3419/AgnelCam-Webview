@@ -9,10 +9,36 @@ from .serializers import LoginSerializer
 
 
 class LoginView(APIView):
+    """
+    View to handle user login by validating the Personal Access Token and issuing a JWT.
+
+    Endpoint:
+        POST /login/
+
+    Request Body:
+        - personal_access_token (str): The Personal Access Token for authentication.
+
+    Response:
+        - 200 OK: Returns a JSON response containing the JWT if the token is valid.
+        - 400 Bad Request: If the request data is invalid.
+        - 401 Unauthorized: If the Personal Access Token is invalid or not authenticated.
+    """
+
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request):
+        """
+        Handle POST requests to authenticate a user and issue a JWT.
+
+        Validates the incoming Personal Access Token, checks its authenticity, and generates a JWT if the token is valid.
+
+        Parameters:
+            - request (Request): The HTTP request object containing the Personal Access Token.
+
+        Returns:
+            - Response: A response object containing the JWT if authentication is successful or error messages if not.
+        """
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
