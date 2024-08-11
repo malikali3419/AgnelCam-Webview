@@ -9,10 +9,11 @@ AngelCam Web View is a Django project that provides a web interface for interact
 3. [API Endpoints](#api-endpoints)
    - [Accounts](#accounts)
    - [Cameras](#cameras)
-4. [Usage](#usage)
-5. [Running frontend](#running-frontend)
+4. [Running frontend](#running-frontend)
    - [Without Docker](#without-docker)
    - [With Docker](#with-docker)
+   -
+5. [Usage](#usage)
 
 ## Installation
 
@@ -154,7 +155,6 @@ To run the frontend project without Docker, follow these steps:
 
 ## Usage
 
-- **Login**: Use the `/api/accounts/login` endpoint to obtain a token.
-- **Manage Cameras**: Use the `/api/cameras/` endpoints to interact with camera data.
-- **Control Recordings**: Use the `/api/recording/` endpoints to control and get information about recordings.
+- **Login**: Use the `http://localhost:3000/login` endpoint to obtain a token.
+- **Manage Cameras**: Use the `http://localhost:3000/cameras` endpoints to interact with camera data.
 
